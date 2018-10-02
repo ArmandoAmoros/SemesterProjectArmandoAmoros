@@ -1,0 +1,19 @@
+<launch>
+  <!-- declare arg to be passed in -->
+  <arg name="file" />
+  <arg name="time" /> 
+
+  <node pkg="rosbag" type="play" name="player1" output="screen" args="--clock /home/armando/catkin_ws/src/bags/rovio/sinRand/bag_$(arg file).bag"/>
+
+  <group ns="firefly">
+    <node pkg="rovio" type="rovio_node" name="rovio" output="screen">
+      <param name="filter_config" value="$(find mav_ground_control_backend)/cfg/rovio.info"/>
+      <param name="camera0_config" value="$(find mav_ground_control_backend)/cfg/euroc_cam0.yaml"/>
+      <remap from="imu0" to="vi_sensor/imu"/>
+      <remap from="cam0/image_raw" to="vi_sensor/left/image_raw"/>
+    </node>
+  </group>
+
+  <node pkg="rosbag" type="record" name="player2" output="screen" args="/firefly/imu /firefly/ground_truth/transform /firefly/ground_truth/odometry /firefly/rovio/transform /firefly/rovio/odometry -O /home/armando/catkin_ws/src/bags/rovio/conRand/bag_$(arg file) --duration $(arg time)"/>
+
+</launch>
